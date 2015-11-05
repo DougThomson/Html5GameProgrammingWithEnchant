@@ -4,13 +4,21 @@ window.onload = function() {
 	var game = new Core(320, 320);
 
 	game.addLabel = function(text, font, color, x, y) {
-		console.log('colour = ' + color);
+		// console.log('colour = ' + color);
+		if(game.frame % 3 !== 0) {
+			return;
+		}
 		var label = new Label(text);
 		label.font = font;
 		label.color = color;
 		label.x = x;
 		label.y = y;
 		game.rootScene.addChild(label);
+		label.addEventListener(Event.ENTER_FRAME, function() {
+			label.y --;
+			label.x ++;
+			if(label.age > 10) game.rootScene.removeChild(label);
+		})
 	}
 	
 	game.addLabel("50 points", "16px sans-serif", "rgb(255, 0, 0)", 50, 50);
