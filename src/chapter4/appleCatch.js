@@ -78,11 +78,13 @@ window.onload = function() {
 		apple.addEventListener(Event.ENTER_FRAME, function() {
 			apple.y += apple.speed;
 			// collision with bear
-
+			// if(bear.within(apple, 16)) {
+			if(bear.intersect(apple)) {
+				game.score += 30;
+				game.rootScene.removeChild(apple);
+			}
 			// collision with ground
-			// else if(apple.y > 320 - 32) {
-				// above line from book is wrong, else without if
-			if(apple.y > 320 - 32) {
+			else if(apple.y > 320 - 32) {
 				game.rootScene.removeChild(apple);
 			}
 		});
@@ -102,7 +104,10 @@ window.onload = function() {
 				"<BR />Score:" + game.score;
 		} else {
 			// display game over
-			// game.end(game.score, "Your score is " + game.score);
+			 
+			console.log(game.score, "Your score is " + game.score);
+			 // game.end(game.score, "Your score is " + game.score);
+			 game.end(game.score, "Your score is " + game.score);
 		}
 	});
 
