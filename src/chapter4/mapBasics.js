@@ -39,7 +39,7 @@ window.onload = function() {
 			else if(game.input.left) {
 				player.dir = DIR_LEFT;
 				player.x -= 4;
-				if(map.hitTest(player.x + 16, player.y + 32)) player.x =+ 4;
+				if(map.hitTest(player.x + 16, player.y + 32)) player.x += 4;
 			}
 			// move right
 			else if(game.input.right) {
@@ -51,7 +51,11 @@ window.onload = function() {
 			if(!game.input.up && !game.input.down &&
 				!game.input.left && !game.input.right) player.age = 1; //standing still
 
-				player.frame = player.anim[player.dir * 4 + (player.age % 4)];
+			player.frame = player.anim[player.dir * 4 + (player.age % 4)];
+
+			if(calcLen(player.x + 16, player.y + 16, 20 * 16 + 8, 17 * 16 +8) <= 16) {
+				game.end(0, "Goaaaaalazio");
+			}
 		});						
 
 
@@ -88,6 +92,10 @@ window.onload = function() {
 
 	game.start();
 };
+
+function calcLen(x0, y0, x1, y1) {
+	return Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
+}
 
 function loadMapData(x, y, game) {
 	var map = new Map(x, y);
