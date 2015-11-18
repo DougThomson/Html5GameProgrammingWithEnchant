@@ -16,6 +16,9 @@ Pit = Class.create(Sprite, {
 		this.nextMode = 0;
 		// wait for a random number of (0 - 99) frames
 		this.waitFor = game.frame  + rand(100);
+		// stores info on whether or not the droid has been whacked
+		this.currentlyWhacked = false;
+		this.instanceName = "x=" + x + " y=" + y;
 	},
 	tick:function() {
 		// onle change the frame every other frame
@@ -55,6 +58,7 @@ Pit = Class.create(Sprite, {
 				if(game.frame > this.waitFor) {
 					// make a transition to the next mode
 					this.mode = this.nextMode;
+					this.currentlyWhacked = false;
 				}
 				break;
 
@@ -64,16 +68,19 @@ Pit = Class.create(Sprite, {
 		
 	},
 	hit:function() {
-			// only when droid has appeared at least half-way
-			if(this.frame >= 2) {
-				// droid after being whacked
-				this.frame = 5;
-				// switch to waiting mode
-				this.mode = 2;
-				this.netMode = 1;
-				// number of frames to wait is fixed at 10
-				this.waitFor = game.frame + 10;
-			}
+		if(this.currentlyWhacked) return;
+
+		// only when droid has appeared at least half-way
+		if(this.frame >= 2) {
+			this.currentlyWhacked = true;
+			// droid after being whacked
+			this.frame = 5;
+			// switch to waiting mode
+			this.mode = 2;
+			this.nextMode = 1;
+			// number of frames to wait is fixed at 10
+			this.waitFor = game.frame + 100;
+		}
 	}
 });
 
@@ -82,8 +89,13 @@ window.onload = function() {
 	// load droid image
 	game.preload('../images/mogura.png');
 	game.onload = function() {
-		var pit = new Pit(100, 100);
-		game.rootScene.addChild(pit);
+		// line up holes in a 4 x 4 matrix
+		for(var y = 0; y < 4; y++) {
+			for(var x=0; x < 4; x++) {
+				var pit = new Pit(x * 48 +20, y * 48 + 20);
+				game.rootScene.addChild(pit);
+			}
+		}
 	}
 	game.start();
 };
