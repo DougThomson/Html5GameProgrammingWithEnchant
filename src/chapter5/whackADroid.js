@@ -1,4 +1,7 @@
 enchant();
+// number of appearances of droid
+maxDroid = 30;
+totalDroid = 16;
 Pit = Class.create(Sprite, {
 	initialize:function(x, y) {
 		// call the sprite class (super class) constructor
@@ -41,7 +44,7 @@ Pit = Class.create(Sprite, {
 			// droid is hiding in the hole
 			case 1:
 				this.frame--;
-				// change mode after complely hiding
+				// if droid is hidden...
 				if(this.frame <= 0) {
 					// switch to mode 2 (waiting)
 					this.mode = 2;
@@ -49,6 +52,18 @@ Pit = Class.create(Sprite, {
 					this.nextMode = 0;
 					// set a random waiting time for 0-99 frames
 					this.waitFor = game.frame + rand(100);
+					// reset flag as the whacked Droid disappears
+					this.currentlyWhacked = false;
+
+					// reduce maximum amount of droids
+					maxDroid--;
+					// if the amount is exceeded the droid should not appear
+					if(maxDroid <=0) {
+						this.mode = 3;
+						if(maxDroid <= -1 * totalDroid + 1) {
+							game.end(scoreLabel.score, scoreLabel.text);
+						}
+					}
 				}
 				break;
 			// droid is waiting
@@ -58,7 +73,7 @@ Pit = Class.create(Sprite, {
 				if(game.frame > this.waitFor) {
 					// make a transition to the next mode
 					this.mode = this.nextMode;
-					this.currentlyWhacked = false;
+					
 				}
 				break;
 
@@ -80,15 +95,39 @@ Pit = Class.create(Sprite, {
 			this.nextMode = 1;
 			// number of frames to wait is fixed at 10
 			this.waitFor = game.frame + 100;
+			// add score
+			scoreLabel.add(1);
 		}
 	}
 });
+
+// scorelable class definition, extendin label class
+ScoreLabel = Class.create(Label, {
+	initialize : function(x, y) {
+		// Call the Label class constructor
+		enchant.Label.call(this, "SCORE:0");
+		this.x = x;
+		this.y = y;
+		this.score = 0;
+	},
+	// Adds points to the score
+	add : function(pts) {
+		this.score += pts;
+		// change the displayed score
+		this.text = "SCORE:" + this.score;
+	}
+});
+
 
 window.onload = function() {
 	game = new Game(320, 320);
 	// load droid image
 	game.preload('../images/mogura.png');
 	game.onload = function() {
+		// display scorelabel
+		scoreLabel = new ScoreLabel(5, 5);
+		game.rootScene.addChild(scoreLabel);
+
 		// line up holes in a 4 x 4 matrix
 		for(var y = 0; y < 4; y++) {
 			for(var x=0; x < 4; x++) {
@@ -96,6 +135,12 @@ window.onload = function() {
 				game.rootScene.addChild(pit);
 			}
 		}
+
+		// // random holes on the screen
+		// for(var i = 0;i < 7; i++) {
+		// 	var pit = new Pit(rand(300), rand(300));
+		// 	game.rootScene.addChild(pit);
+		// }
 	}
 	game.start();
 };
